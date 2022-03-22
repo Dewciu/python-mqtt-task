@@ -1,5 +1,5 @@
 import os, struct
-from file_manager.file_manager import archieve_dir
+from file_manager.file_manager import FileManager
 from crccheck.crc import CrcKermit
 
 def byte_string_reverse(byte_string):
@@ -55,10 +55,10 @@ def get_tagID_from_filename(filename_string):
     return tag_id
 
 def data_verify(file_name, content):
-    archieve_files = next(os.walk(archieve_dir))[2]
+    archieve_files = next(os.walk(FileManager().archieve_dir))[2]
     
     if file_name in archieve_files:
-        file_dir = archieve_dir + file_name
+        file_dir = FileManager().archieve_dir + file_name
         archieved_content = open(file_dir).read()
 
         if get_tagID_from_content(content) == get_tagID_from_filename(file_name):
@@ -81,6 +81,7 @@ def data_decode(received_dict_data):
         data_verify_feedback = data_verify(filename, content)
 
         if data_verify_feedback == 1:
+            state = 1
             splitted_content = byte_string_split(content)
 
             position_data = {
@@ -97,11 +98,16 @@ def data_decode(received_dict_data):
                 "superFrameNumber": int(splitted_content[6], 16)
             }
 
-            return decoded_data
+            return decoded_data, state
 
         elif data_verify_feedback == 2:
-            pass
+            state = 2
+            return received_dict_data, state
+
         elif data_verify_feedback == 3:
-            pass
+            state = 3
+            return received_dict_data, state
+
         elif data_verify_feedback == 4:
-            pass 
+            state = 4
+            return received_dict_data, state
