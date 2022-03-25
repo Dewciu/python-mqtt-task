@@ -1,5 +1,4 @@
 import json
-import time
 from paho.mqtt.client import Client
 from mqtt_manager import broker
 from decoder.decoder import data_decode
